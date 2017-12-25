@@ -1,7 +1,7 @@
 
 import numpy as np
 import random
-import pac as p
+import pacman as p
 
 ALFA = 0.1
 DISCOUNT = 0.9
@@ -32,7 +32,7 @@ def futuro_premio(pac, tabla_q):
     premio = None
     for i in range(1, 5):
         aux = tabla_q[jugador, fantasmas, tablero, i]
-        if(premio is None or premio < aux)
+        if(premio is None or premio < aux):
             premio = aux
 
 
@@ -47,7 +47,7 @@ def futuro_premio(pac, tabla_q):
 
 
 
-pac = p.pac(p.tablero_pequeño)
+pac = p.Pacman(p.tablero_pequeño)
 
 # Diccionario con todos los estados, tuplas van
 # (jugador,fantasmas,tablero,movimiento) : Premio esperado
