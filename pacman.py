@@ -160,6 +160,16 @@ class Pacman:
         return st
 
 
+        def politica(self,tabla):
+            """ A partir de un diccionario, elige el mejor
+                movimiento
+            """
+            fantasmas = tuple(self.fantasmas)
+            tablero = tuple(map(tuple, np.asarray(self.tablero)))
+            movimientos = {tabla[self.jugador,fantasmas,tablero,i] for i in range(1,5)}
+            return np.argmax(movimientos)
+
+
 mapeo = {
     "w": 3,
     "a": 1,
@@ -169,6 +179,8 @@ mapeo = {
 
 
 def mov():
+    """Movimiento con el teclado
+    """
     inp = None
     while inp is None:
         aux = input("Movimiento :")
@@ -177,6 +189,11 @@ def mov():
         except KeyError:
             print("Fuck u")
     return inp
+
+
+
+
+
 
 
 # Main shit
@@ -198,21 +215,3 @@ tablero_grande = np.matrix("""1 1 1 1 1 1 1 1;
                        1 1 1 1 0 0 0 1;
                        1 0 0 0 0 0 0 1;
                        1 1 1 1 1 1 1 1""")
-
-
-# Interfaz fisica
-def interfaz():
-    pacman = Pacman(tablero)
-    print(pacman.imprimir())
-    while True:
-        pacman.actualizar(mov())
-        print(pacman.imprimir())
-        print(pacman.puntuacion)
-        if(pacman.aGanado() or pacman.aPerdido()):
-            break
-
-    print("Has tenido %i puntos", pacman.puntuacion)
-    if pacman.aGanado():
-        print("Enorabuena")
-    if(pacman.aPerdido()):
-        print("Jodete")

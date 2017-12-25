@@ -1,25 +1,15 @@
 
 import numpy as np
 import random
-import pacman as p
+import pac as p
 
 ALFA = 0.1
 DISCOUNT = 0.9
-pac = p.Pacman(p.tablero_pequeño)
+CONTADOR = 100
 
-# Diccionario con todos los estados, tuplas van
-# (jugador,fantasmas,tablero,movimiento) : Premio esperado
-tabla_q = {}
-while True:
-    m = politica()
-    jugador = pac.jugador
-    fantasmas = tuple(pac.fantasmas)
-    tablero = tuple(map(tuple, np.asarray(pac.tablero)))
-    premio = pac.actualizar(m)
 
-    tabla_q[jugador, fantasmas, tablero, m] =           \
-        (1 - ALFA) * tabla_q[jugador, fantasmas, tablero, m] + \
-        ALFA * (premio + DISCOUNT)
+
+
 
 
 def politica():
@@ -31,11 +21,68 @@ def politica():
     return (m)
 
 
-def futuro_premio(pacman, tabla_q):
+
+
+def futuro_premio(pac, tabla_q):
     jugador = pac.jugador
     fantasmas = tuple(pac.fantasmas)
     tablero = tuple(map(tuple, np.asarray(pac.tablero)))
 
+    # TODO Hacerlo con una comprension listas
     premio = None
     for i in range(1, 5):
-        if(premio is None or)
+        aux = tabla_q[jugador, fantasmas, tablero, i]
+        if(premio is None or premio < aux)
+            premio = aux
+
+
+
+
+
+
+
+
+
+
+
+
+
+pac = p.pac(p.tablero_pequeño)
+
+# Diccionario con todos los estados, tuplas van
+# (jugador,fantasmas,tablero,movimiento) : Premio esperado
+tabla_q = {}
+
+while CONTADOR != 0:
+    m = politica()
+    jugador = pac.jugador
+    fantasmas = tuple(pac.fantasmas)
+    tablero = tuple(map(tuple, np.asarray(pac.tablero)))
+    premio = pac.actualizar(m)
+
+    tabla_q[jugador, fantasmas, tablero, m] =           \
+        (1 - ALFA) * tabla_q[jugador, fantasmas, tablero, m] + \
+        ALFA * (premio + DISCOUNT*futuro_premio(pac,tabla_q))
+    CONTADOR -= 1
+
+
+# Probamos ahora la Politica
+
+
+# Interfaz fisica
+# Politica es una funcion, le puedes pasar mov()
+# u otra funcion cualquiera
+
+print(pac.imprimir())
+while True:
+    pac.actualizar(pac.politica(tabla_q))
+    print(pac.imprimir())
+    print(pac.puntuacion)
+    if(pac.aGanado() or pac.aPerdido()):
+        break
+
+print("Has tenido %i puntos", pac.puntuacion)
+if pac.aGanado():
+    print("Enorabuena")
+if(pac.aPerdido()):
+    print("Jodete")
