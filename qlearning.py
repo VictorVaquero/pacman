@@ -5,19 +5,25 @@ import pacman as p
 
 ALFA = 0.1
 DISCOUNT = 0.9
-CONTADOR = 100
+CONTADOR = 100000
 
 
 
 
 
 
-def politica():
+def politica(jugador, fantasmas, tablero,tabla):
     """ Devuelme el movimiento del jugador
         La politica puede ser aleatoria, a trabes de la tabla_q,
         con heuristicas....
     """
-    m = np.random.randint(1, 4)
+
+    try:
+        movimientos = [tabla[jugador,fantasmas,tablero,i] for i in range(1,5)]
+        print(movimientos)
+        m = movimientos.index(max(movimientos))+1
+    except KeyError:
+        m = np.random.randint(1, 4)
     return (m)
 
 
@@ -31,39 +37,38 @@ def futuro_premio(pac, tabla_q):
     # TODO Hacerlo con una comprension listas
     premio = None
     for i in range(1, 5):
-        aux = tabla_q[jugador, fantasmas, tablero, i]
+        aux = tabla_q.get((jugador, fantasmas, tablero, i),default)
         if(premio is None or premio < aux):
             premio = aux
+    return premio
 
 
 
 
-
-
-
-
-
-
-
-
-
-pac = p.Pacman(p.tablero_pequeño)
+pac = p.Pacman(p.tablero_micro)
 
 # Diccionario con todos los estados, tuplas van
 # (jugador,fantasmas,tablero,movimiento) : Premio esperado
 tabla_q = {}
+default = 0
 
 while CONTADOR != 0:
-    m = politica()
+    #print(pac.imprimir())
+
     jugador = pac.jugador
     fantasmas = tuple(pac.fantasmas)
     tablero = tuple(map(tuple, np.asarray(pac.tablero)))
+    m = politica(jugador, fantasmas, tablero,tabla_q)
     premio = pac.actualizar(m)
 
     tabla_q[jugador, fantasmas, tablero, m] =           \
-        (1 - ALFA) * tabla_q[jugador, fantasmas, tablero, m] + \
+        (1 - ALFA) * tabla_q.get((jugador, fantasmas, tablero, m),default) + \
         ALFA * (premio + DISCOUNT*futuro_premio(pac,tabla_q))
-    CONTADOR -= 1
+
+    if(pac.aGanado() or pac.aPerdido()):
+        print("Prueba %i, puntuacion %i",CONTADOR, pac.puntuacion)
+        pac.reset()
+        CONTADOR -= 1
 
 
 # Probamos ahora la Politica
@@ -72,17 +77,15 @@ while CONTADOR != 0:
 # Interfaz fisica
 # Politica es una funcion, le puedes pasar mov()
 # u otra funcion cualquiera
-
+PARTIDAS = 5
 print(pac.imprimir())
-while True:
+while PARTIDAS != 0:
     pac.actualizar(pac.politica(tabla_q))
     print(pac.imprimir())
-    print(pac.puntuacion)
     if(pac.aGanado() or pac.aPerdido()):
-        break
+        print("Partida %i, puntuacion %i",PARTIDAS, pac.puntuacion)
+        pac.reset()
+        PARTIDAS -= 1
 
-print("Has tenido %i puntos", pac.puntuacion)
-if pac.aGanado():
-    print("Enorabuena")
-if(pac.aPerdido()):
-    print("Jodete")
+
+print(tabla_q)

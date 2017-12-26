@@ -43,6 +43,7 @@ class Pacman:
         """ Inicializa el tablero con los agentes
             puntos y galletas
         """
+        self._Mtablero = tablero.copy()
         self.tablero = tablero
         self.num_fantasmas = num_fantasmas
         self.puntuacion = 0
@@ -63,6 +64,7 @@ class Pacman:
             if(self.tablero[x, y] == self.SUELO):
                 self.jugador = (x, y)
                 t = True
+
         self.fantasmas = []
         for i in range(self.num_fantasmas):
             t = False
@@ -138,6 +140,15 @@ class Pacman:
         self.puntuacion += puntos
         return puntos
 
+    def reset(self):
+        self.tablero = self._Mtablero.copy()
+        self.puntuacion = 0
+        self.estado = self.JUGANDO
+
+        self.inicializar_jugadores()
+        self.inicializar_puntos()
+
+
     def aGanado(self):
         return self.estado == self.GANADO
 
@@ -160,14 +171,15 @@ class Pacman:
         return st
 
 
-        def politica(self,tabla):
-            """ A partir de un diccionario, elige el mejor
-                movimiento
-            """
-            fantasmas = tuple(self.fantasmas)
-            tablero = tuple(map(tuple, np.asarray(self.tablero)))
-            movimientos = {tabla[self.jugador,fantasmas,tablero,i] for i in range(1,5)}
-            return np.argmax(movimientos)
+    def politica(self,tabla):
+        """ A partir de un diccionario, elige el mejor
+            movimiento
+        """
+        default = 0
+        fantasmas = tuple(self.fantasmas)
+        tablero = tuple(map(tuple, np.asarray(self.tablero)))
+        movimientos = [tabla.get((self.jugador,fantasmas,tablero,i),default) for i in range(1,5)]
+        return movimientos.index(max(movimientos))+1
 
 
 mapeo = {
@@ -197,6 +209,21 @@ def mov():
 
 
 # Main shit
+
+# Tablero micro
+tablero_micro = np.matrix("""
+                       1 1 1 1 ;
+                       1 0 0 1;
+                       1 0 0 1;
+                       1 1 1 1""")
+
+# Tablero ultra pequeño
+tablero_ultrapequeño = np.matrix("""
+                       1 1 1 1 1;
+                       1 0 0 0 1;
+                       1 0 0 0 1;
+                       1 0 0 0 1;
+                       1 1 1 1 1 """)
 
 # Tablero pequeño
 tablero_pequeño = np.matrix("""1 1 1 1 1 1;
