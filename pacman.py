@@ -22,6 +22,10 @@ class Pacman:
     CAZADO = 1
     GANADO = 2
 
+
+
+
+
     # Diccionario con los movimientos
     # -Y,X
     movimientos = {
@@ -181,8 +185,13 @@ class Pacman:
         default = 0
         fantasmas = tuple(self.fantasmas)
         tablero = tuple(map(tuple, np.asarray(self.tablero)))
-        movimientos = [tabla.get((self.jugador,fantasmas,tablero,i),default) for i in range(1,5)]
-        return movimientos.index(max(movimientos))+1
+        try:
+            movimientos = [tabla[self.jugador,fantasmas,tablero,i] for i in range(1,5)]
+            m = movimientos.index(max(movimientos))+1
+            
+        except KeyError:
+            m = np.random.randint(1, 5)
+        return m
 
 
 mapeo = {

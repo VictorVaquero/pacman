@@ -5,14 +5,15 @@ import pacman as p
 
 ALFA = 0.1
 DISCOUNT = 0.9
-CONTADOR = 10000
-TABLERO_ELEGIDO = p.tablero_ultrapequeño
+CONTADOR = 100000
+PERCENTAJE = 0.4
+TABLERO_ELEGIDO = p.tablero_grande
 
 
 
 
 
-def politica(jugador, fantasmas, tablero,tabla):
+def politica(jugador, fantasmas, tablero,tabla, percentaje):
     """ Devuelme el movimiento del jugador
         La politica puede ser aleatoria, a trabes de la tabla_q,
         con heuristicas....
@@ -21,6 +22,9 @@ def politica(jugador, fantasmas, tablero,tabla):
     try:
         movimientos = [tabla[jugador,fantasmas,tablero,i] for i in range(1,5)]
         m = movimientos.index(max(movimientos))+1
+        s = np.random.binomial(1,percentaje)
+        if s:
+            m = np.random.randint(1, 5)
     except KeyError:
         m = np.random.randint(1, 5)
     return (m)
@@ -57,7 +61,7 @@ while CONTADOR != 0:
     jugador = pac.jugador
     fantasmas = tuple(pac.fantasmas)
     tablero = tuple(map(tuple, np.asarray(pac.tablero)))
-    m = politica(jugador, fantasmas, tablero,tabla_q)
+    m = politica(jugador, fantasmas, tablero,tabla_q, PERCENTAJE)
     premio = pac.actualizar(m)
 
     tabla_q[jugador, fantasmas, tablero, m] =           \
