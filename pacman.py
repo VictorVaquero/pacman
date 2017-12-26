@@ -14,6 +14,8 @@ class Pacman:
     PUNTO_VALOR = 1
     # Puntos por perder partida
     PUNTO_PERDIDA = -10
+    # Puntos ganada
+    PUNTO_GANADA = 10
 
     # Estado final
     JUGANDO = 0
@@ -136,6 +138,7 @@ class Pacman:
                     fin = False
         if fin:
             self.estado = self.GANADO
+            self.puntuacion += self.PUNTO_GANADA
 
         self.puntuacion += puntos
         return puntos

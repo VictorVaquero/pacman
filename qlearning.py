@@ -5,8 +5,8 @@ import pacman as p
 
 ALFA = 0.1
 DISCOUNT = 0.9
-CONTADOR = 100000
-
+CONTADOR = 10000
+TABLERO_ELEGIDO = p.tablero_ultrapequeño
 
 
 
@@ -20,10 +20,9 @@ def politica(jugador, fantasmas, tablero,tabla):
 
     try:
         movimientos = [tabla[jugador,fantasmas,tablero,i] for i in range(1,5)]
-        print(movimientos)
         m = movimientos.index(max(movimientos))+1
     except KeyError:
-        m = np.random.randint(1, 4)
+        m = np.random.randint(1, 5)
     return (m)
 
 
@@ -45,7 +44,7 @@ def futuro_premio(pac, tabla_q):
 
 
 
-pac = p.Pacman(p.tablero_micro)
+pac = p.Pacman(TABLERO_ELEGIDO)
 
 # Diccionario con todos los estados, tuplas van
 # (jugador,fantasmas,tablero,movimiento) : Premio esperado
@@ -83,9 +82,6 @@ while PARTIDAS != 0:
     pac.actualizar(pac.politica(tabla_q))
     print(pac.imprimir())
     if(pac.aGanado() or pac.aPerdido()):
-        print("Partida %i, puntuacion %i",PARTIDAS, pac.puntuacion)
+        print("Partida %i, puntuacion %i",PARTIDAS, pac.puntuacion, pac.aGanado())
         pac.reset()
         PARTIDAS -= 1
-
-
-print(tabla_q)
