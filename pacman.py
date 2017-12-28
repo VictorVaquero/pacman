@@ -178,41 +178,7 @@ class Pacman:
         return st
 
 
-    def politica(self,tabla):
-        """ A partir de un diccionario, elige el mejor
-            movimiento
-        """
-        default = 0
-        fantasmas = tuple(self.fantasmas)
-        tablero = tuple(map(tuple, np.asarray(self.tablero)))
-        try:
-            movimientos = [tabla[self.jugador,fantasmas,tablero,i] for i in range(1,5)]
-            m = movimientos.index(max(movimientos))+1
-            
-        except KeyError:
-            m = np.random.randint(1, 5)
-        return m
 
-
-mapeo = {
-    "w": 3,
-    "a": 1,
-    "s": 4,
-    "d": 2
-}
-
-
-def mov():
-    """Movimiento con el teclado
-    """
-    inp = None
-    while inp is None:
-        aux = input("Movimiento :")
-        try:
-            inp = mapeo[aux]
-        except KeyError:
-            print("Fuck u")
-    return inp
 
 
 

@@ -2,14 +2,32 @@
 import numpy as np
 import random
 import pacman as p
+import tablaEstados as t
 
 ALFA = 0.1
 DISCOUNT = 0.9
-CONTADOR = 100000
-PERCENTAJE = 0.4
-TABLERO_ELEGIDO = p.tablero_grande
+CONTADOR = 10000
+PERCENTAJE = 0.6
+TABLERO_ELEGIDO = p.tablero_ultrapequeño
 
 
+mapeo = {
+    "w": 3,
+    "a": 1,
+    "s": 4,
+    "d": 2
+}
+def mov():
+    """Movimiento con el teclado
+    """
+    inp = None
+    while inp is None:
+        aux = input("Movimiento :")
+        try:
+            inp = mapeo[aux]
+        except KeyError:
+            print("Fuck u")
+    return inp
 
 
 
@@ -18,9 +36,9 @@ def politica(jugador, fantasmas, tablero,tabla, percentaje):
         La politica puede ser aleatoria, a trabes de la tabla_q,
         con heuristicas....
     """
-
     try:
-        movimientos = [tabla[jugador,fantasmas,tablero,i] for i in range(1,5)]
+        movimientos = [tabla.get(jugador, fantasmas, tablero, i) for i in range(1,5)]
+    
         m = movimientos.index(max(movimientos))+1
         s = np.random.binomial(1,percentaje)
         if s:
@@ -28,7 +46,6 @@ def politica(jugador, fantasmas, tablero,tabla, percentaje):
     except KeyError:
         m = np.random.randint(1, 5)
     return (m)
-
 
 
 
@@ -40,7 +57,7 @@ def futuro_premio(pac, tabla_q):
     # TODO Hacerlo con una comprension listas
     premio = None
     for i in range(1, 5):
-        aux = tabla_q.get((jugador, fantasmas, tablero, i),default)
+        aux = tabla_q.get(jugador, fantasmas, tablero, i)
         if(premio is None or premio < aux):
             premio = aux
     return premio
@@ -49,11 +66,7 @@ def futuro_premio(pac, tabla_q):
 
 
 pac = p.Pacman(TABLERO_ELEGIDO)
-
-# Diccionario con todos los estados, tuplas van
-# (jugador,fantasmas,tablero,movimiento) : Premio esperado
-tabla_q = {}
-default = 0
+tabla_q = t.tablaEstados("Bruto")
 
 while CONTADOR != 0:
     #print(pac.imprimir())
@@ -64,9 +77,9 @@ while CONTADOR != 0:
     m = politica(jugador, fantasmas, tablero,tabla_q, PERCENTAJE)
     premio = pac.actualizar(m)
 
-    tabla_q[jugador, fantasmas, tablero, m] =           \
-        (1 - ALFA) * tabla_q.get((jugador, fantasmas, tablero, m),default) + \
-        ALFA * (premio + DISCOUNT*futuro_premio(pac,tabla_q))
+    new_value = (1 - ALFA) * tabla_q.get(jugador, fantasmas, tablero, m) + \
+                ALFA * (premio + DISCOUNT*futuro_premio(pac,tabla_q))
+    tabla_q.set(jugador, fantasmas, tablero, m, new_value)
 
     if(pac.aGanado() or pac.aPerdido()):
         print("Prueba %i, puntuacion %i",CONTADOR, pac.puntuacion)
@@ -83,7 +96,10 @@ while CONTADOR != 0:
 PARTIDAS = 5
 print(pac.imprimir())
 while PARTIDAS != 0:
-    pac.actualizar(pac.politica(tabla_q))
+    jugador = pac.jugador
+    fantasmas = tuple(pac.fantasmas)
+    tablero = tuple(map(tuple, np.asarray(pac.tablero)))
+    pac.actualizar(politica(jugador, fantasmas, tablero,tabla_q, 0))
     print(pac.imprimir())
     if(pac.aGanado() or pac.aPerdido()):
         print("Partida %i, puntuacion %i",PARTIDAS, pac.puntuacion, pac.aGanado())
