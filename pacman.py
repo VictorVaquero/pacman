@@ -22,10 +22,6 @@ class Pacman:
     CAZADO = 1
     GANADO = 2
 
-
-
-
-
     # Diccionario con los movimientos
     # -Y,X
     movimientos = {
@@ -155,7 +151,6 @@ class Pacman:
         self.inicializar_jugadores()
         self.inicializar_puntos()
 
-
     def aGanado(self):
         return self.estado == self.GANADO
 
@@ -178,15 +173,8 @@ class Pacman:
         return st
 
 
-
-
-
-
-
-
-
-
 # Main shit
+
 
 # Tablero micro
 tablero_micro = np.matrix("""
