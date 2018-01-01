@@ -3,10 +3,10 @@ import numpy as np
 import random
 import pacman as p
 import tablaEstados as t
+import copy
 
-ALFA = 0.1
-DISCOUNT = 0.9
-CONTADOR = 10000
+
+CONTADOR = 100
 PERCENTAJE = 0.6
 TABLERO_ELEGIDO = p.tablero_ultrapequeño
 
@@ -50,35 +50,23 @@ def politica(jugador, fantasmas, tablero, tabla, percentaje):
     return (m)
 
 
-def futuro_premio(pac, tabla_q):
-    jugador = pac.jugador
-    fantasmas = tuple(pac.fantasmas)
-    tablero = tuple(map(tuple, np.asarray(pac.tablero)))
-
-    # TODO Hacerlo con una comprension listas
-    premio = None
-    for i in range(1, 5):
-        aux = tabla_q.get(jugador, fantasmas, tablero, i)
-        if(premio is None or premio < aux):
-            premio = aux
-    return premio
-
-
 pac = p.Pacman(TABLERO_ELEGIDO)
-tabla_q = t.tablaEstados("Bruto")
+# tabla_q = t.tablaEstados("Bruto")
+(x, y) = TABLERO_ELEGIDO.shape
+tabla_q = t.tablaEstados("Red", [x * y, 1], "rectified")
+
 
 while CONTADOR != 0:
     # print(pac.imprimir())
 
     jugador = pac.jugador
     fantasmas = tuple(pac.fantasmas)
-    tablero = tuple(map(tuple, np.asarray(pac.tablero)))
+    tablero = copy.deepcopy(pac.tablero)
+
     m = politica(jugador, fantasmas, tablero, tabla_q, PERCENTAJE)
     premio = pac.actualizar(m)
 
-    new_value = (1 - ALFA) * tabla_q.get(jugador, fantasmas, tablero, m) + \
-        ALFA * (premio + DISCOUNT * futuro_premio(pac, tabla_q))
-    tabla_q.set(jugador, fantasmas, tablero, m, new_value)
+    tabla_q.update(jugador, fantasmas, tablero, m, premio)
 
     if(pac.aGanado() or pac.aPerdido()):
         print("Prueba %i, puntuacion %i", CONTADOR, pac.puntuacion)
@@ -97,7 +85,7 @@ print(pac.imprimir())
 while PARTIDAS != 0:
     jugador = pac.jugador
     fantasmas = tuple(pac.fantasmas)
-    tablero = tuple(map(tuple, np.asarray(pac.tablero)))
+    tablero = copy.deepcopy(pac.tablero)
     pac.actualizar(politica(jugador, fantasmas, tablero, tabla_q, 0))
     print(pac.imprimir())
     if(pac.aGanado() or pac.aPerdido()):
